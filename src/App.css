@@ -1,59 +1,247 @@
-// src/components/ZoharMonitor.jsx
-import React from 'react';
-import { HEBREW_DATA } from '../data/constants';
+/* --- RESET & VARIABLES GLOBALES --- */
+:root {
+  --bg-color: #f0f2f5;       /* Gris Suave (Fondo) */
+  --card-bg: #ffffff;        /* Blanco (Tarjetas) */
+  --primary: #111827;        /* Negro Suave (Texto) */
+  --accent: #3b82f6;         /* Azul (Detalles) */
+  --border: #e5e7eb;         /* Bordes */
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --radius: 16px;
+}
 
-const ZoharMonitor = ({ inputString }) => {
-  const characters = inputString.split('');
+* {
+  box-sizing: border-box;
+}
 
-  return (
-    <div className="monitor-container">
-      <h2 className="monitor-header">MONITOR DE RESONANCIA (ZOHAR)</h2>
-      
-      {/* Visualización de Tarjetas (CSS maneja el RTL) */}
-      <div className="display-area">
-        {characters.length === 0 ? (
-          <span style={{ width: '100%', textAlign: 'center', opacity: 0.5, direction: 'ltr' }}>
-            Esperando pulsos...
-          </span>
-        ) : (
-          characters.map((char, index) => {
-            const data = HEBREW_DATA[char];
-            const bgColor = data ? data.color : 'transparent';
-            
-            // Construcción de la Ficha Técnica (Tooltip)
-            const tooltipInfo = data 
-              ? `Letra: ${data.name} (${data.val})\n` +
-                `Tipo: ${data.type}\n` +
-                `Sefirá: ${data.sefira}\n` +
-                `Regente: ${data.planet}\n` +
-                `Elemento: ${data.element}\n\n` +
-                `>> ${data.energy}`
-              : 'Carácter desconocido';
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--primary);
+  -webkit-font-smoothing: antialiased;
+}
 
-            return (
-              <div 
-                key={index} 
-                className="char-card" 
-                title={tooltipInfo}
-              >
-                <div 
-                  className="char-aura" 
-                  style={{ backgroundColor: bgColor, opacity: 0.3 }}
-                ></div>
-                <span className="char-symbol">{char}</span>
-                {data && <span className="char-val">{data.val}</span>}
-              </div>
-            );
-          })
-        )}
-      </div>
+/* --- CONTENEDOR PRINCIPAL (SHELL) --- */
+.app-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
 
-      {/* Buffer de Texto Crudo */}
-      <div className="raw-text">
-        {inputString || "..."}
-      </div>
-    </div>
-  );
-};
+/* Encabezado */
+header {
+  text-align: center;
+  padding: 1rem 0;
+}
 
-export default ZoharMonitor;
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+}
+
+header p {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* --- LAYOUT RESPONSIVO --- */
+/* Móvil primero: Todo en una columna vertical */
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Escritorio: Si la pantalla es ancha, poner paneles lado a lado */
+@media (min-width: 900px) {
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 50% - 50% */
+    align-items: start;
+    gap: 2rem;
+  }
+}
+
+/* Paneles (Cajas blancas) */
+.panel {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+/* --- MONITOR ZOHAR (EL VISUALIZADOR) --- */
+.monitor-header {
+  text-align: center;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #888;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+/* Área de las letras (La Matriz) */
+.display-area {
+  background-color: #fafafa;
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 1rem;
+  min-height: 150px;
+  
+  display: flex;
+  flex-wrap: wrap; /* Si no caben, bajan a la siguiente linea */
+  gap: 8px;
+  
+  /* CRÍTICO PARA HEBREO: Alineación Derecha */
+  direction: rtl; 
+  justify-content: flex-start; 
+  align-content: flex-start;
+}
+
+/* Tarjeta de cada Letra */
+.char-card {
+  position: relative;
+  width: 50px;
+  height: 65px;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  cursor: help; /* Cambia el cursor para indicar que hay info */
+  transition: transform 0.1s ease;
+  overflow: hidden;
+}
+
+.char-card:active {
+  transform: scale(0.95);
+}
+
+/* Capa de Color (Aura) */
+.char-aura {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.2; /* Transparencia suave */
+  z-index: 0;
+}
+
+.char-symbol {
+  font-family: 'Times New Roman', serif; /* Fuente clásica para hebreo */
+  font-size: 1.8rem;
+  font-weight: bold;
+  z-index: 1;
+  line-height: 1;
+}
+
+.char-val {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #555;
+  z-index: 1;
+  margin-top: 4px;
+}
+
+/* Texto plano debajo de las letras */
+.raw-text {
+  margin-top: 1rem;
+  text-align: center;
+  font-family: 'Times New Roman', serif;
+  font-size: 1.5rem;
+  direction: rtl; /* Escribe de derecha a izquierda */
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  letter-spacing: 2px;
+}
+
+/* --- TECLADO (CONTROL PANEL) --- */
+.keyboard-title {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.keys-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.key-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Botones de letras hebreas */
+.hebrew-btn {
+  flex: 1; /* Ocupan todo el ancho disponible */
+  height: 55px; /* Altura táctil cómoda para dedos */
+  font-family: 'Times New Roman', serif;
+  font-size: 1.5rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: background 0.1s;
+  
+  /* Evita el zoom al hacer doble tap en móviles */
+  touch-action: manipulation; 
+}
+
+.hebrew-btn:active {
+  background-color: #e5e7eb;
+  transform: translateY(2px);
+}
+
+/* Botones de Control (Espacio, Borrar) */
+.controls-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr; /* Espacio es doble de ancho */
+  gap: 10px;
+}
+
+.control-btn {
+  height: 50px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.space-btn {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.delete-btn {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.clear-btn {
+  background: #ef4444;
+  color: white;
+}
