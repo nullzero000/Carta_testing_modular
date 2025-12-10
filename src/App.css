@@ -1,133 +1,225 @@
-/* Reset Básico */
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-  font-family: 'Courier New', monospace; /* Estética Terminal */
+/* --- CONFIGURACIÓN DEL NÚCLEO (ROOT) --- */
+:root {
+  --bg-color: #f0f2f5;
+  --card-bg: #ffffff;
+  --primary: #1f2937;
+  --accent: #3b82f6;
+  --danger: #ef4444;
+  --touch-target: 44px; /* Mínimo estándar para dedos */
 }
 
+#root {
+  max-width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 1rem;
+  box-sizing: border-box;
+  font-family: 'Courier New', monospace;
+  background-color: var(--bg-color);
+  color: var(--primary);
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- ESTRUCTURA (SHELL) --- */
 .app-shell {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* Layout Principal */
+header {
+  text-align: center;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+header p {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0.2rem 0 0 0;
+}
+
+/* --- LAYOUT PRINCIPAL (GRID REACTIVA) --- */
 .main-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
+  display: flex;
+  flex-direction: column; /* Por defecto: Columna (Móvil) */
+  gap: 1rem;
 }
 
+/* Solo en pantallas grandes (>768px) se divide en dos columnas */
 @media (min-width: 768px) {
   .main-layout {
-    grid-template-columns: 1fr 1fr; /* Dividir pantalla en escritorio */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
   }
 }
 
 .panel {
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background: var(--card-bg);
+  padding: 1rem;
+  border-radius: 16px; /* Bordes más suaves */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Monitor Zohar */
+/* --- MÓDULO VISUAL (MONITOR ZOHAR) --- */
+.monitor-panel {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
 .display-area {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  min-height: 100px;
+  gap: 6px;
   padding: 10px;
-  background: #f9f9f9;
-  border: 1px dashed #ccc;
-  border-radius: 8px;
-  justify-content: center;
+  background: #fafafa;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+  justify-content: center; /* Centrado en móvil */
+  align-content: flex-start;
+  min-height: 120px;
 }
 
 .char-card {
   position: relative;
-  width: 50px;
-  height: 60px;
+  width: 40px;  /* Ligeramente más pequeños para que quepan más */
+  height: 50px;
   border: 2px solid;
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  background: white;
+  transition: transform 0.1s;
+}
+
+.char-symbol {
+  font-size: 1.4rem;
+  font-weight: 700;
+  z-index: 2;
+  line-height: 1;
+}
+
+.char-val {
+  font-size: 0.6rem;
+  z-index: 2;
+  margin-top: 2px;
+  font-weight: bold;
 }
 
 .char-aura {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 0;
-}
-
-.char-symbol {
-  font-size: 1.5rem;
-  font-weight: bold;
   z-index: 1;
-}
-
-.char-val {
-  font-size: 0.6rem;
-  z-index: 1;
-  margin-top: -5px;
 }
 
 .raw-text {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #666;
-  text-align: left;
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: #888;
+  word-break: break-all;
+  text-align: center;
 }
 
-/* Teclado */
+/* --- TECLADO ESTRUCTURAL (OPTIMIZADO TÁCTIL) --- */
+.keyboard-container h3 {
+  text-align: center;
+  margin-top: 0;
+  font-size: 1rem;
+  color: #444;
+}
+
 .keys-grid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 1rem;
+  touch-action: manipulation; /* Elimina delay de tap en móviles */
 }
 
 .key-row {
   display: flex;
-  justify-content: center;
-  gap: 5px;
+  justify-content: space-between; /* Distribuye espacio */
+  gap: 4px;
 }
 
 .hebrew-btn {
-  width: 40px;
-  height: 40px;
-  font-size: 1.2rem;
+  flex: 1; /* El botón crece para llenar el hueco */
+  height: 48px; /* Altura táctil cómoda */
+  font-size: 1.3rem;
+  font-family: 'Times New Roman', serif; /* Mejor renderizado hebreo */
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   cursor: pointer;
-  background: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.hebrew-btn:hover {
-  background: #e0e0e0;
-  transform: translateY(-2px);
-}
-
-.controls-row {
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 10px;
+  padding: 0;
+  transition: background 0.1s, transform 0.05s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hebrew-btn:active {
+  background: #e5e7eb;
+  transform: scale(0.95);
+}
+
+/* --- CONTROLES INFERIORES --- */
+.controls-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr; /* Espacio más grande (2fr) para el botón Espacio */
+  gap: 8px;
 }
 
 .control-btn {
-  padding: 8px 16px;
-  cursor: pointer;
+  height: 48px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.space-btn { background: #ddd; }
-.delete-btn { background: #ffcccb; color: #d32f2f; }
-.clear-btn { background: #d32f2f; color: white; }
+.space-btn {
+  background: #d1d5db;
+  color: #374151;
+}
+
+.delete-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.clear-btn {
+  background: #ef4444;
+  color: white;
+}
+
+/* --- AJUSTES PARA PANTALLAS MUY PEQUEÑAS (iPhone SE, etc) --- */
+@media (max-width: 360px) {
+  .hebrew-btn {
+    height: 42px;
+    font-size: 1.1rem;
+  }
+  
+  #root {
+    padding: 0.5rem;
+  }
+}
