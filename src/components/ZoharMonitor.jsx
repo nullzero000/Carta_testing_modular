@@ -1,27 +1,41 @@
+// src/components/ZoharMonitor.jsx
 import React from 'react';
 import { HEBREW_DATA } from '../data/constants';
 
 const ZoharMonitor = ({ inputString }) => {
-  // Convertimos el string en un array para procesar letra por letra
   const characters = inputString.split('');
 
   return (
     <div className="monitor-container">
-      <h2>Monitor de Resonancia</h2>
+      <h2 className="monitor-header">MONITOR DE RESONANCIA (ZOHAR)</h2>
       
-      {/* Visualización de Texto como Bloques de Energía */}
+      {/* Visualización de Tarjetas (CSS maneja el RTL) */}
       <div className="display-area">
         {characters.length === 0 ? (
-          <span className="placeholder">Esperando coordenadas...</span>
+          <span style={{ width: '100%', textAlign: 'center', opacity: 0.5, direction: 'ltr' }}>
+            Esperando pulsos...
+          </span>
         ) : (
           characters.map((char, index) => {
-            // Buscamos datos, si es espacio o desconocido usamos gris
             const data = HEBREW_DATA[char];
             const bgColor = data ? data.color : 'transparent';
-            const border = data ? data.color : '#ccc';
             
+            // Construcción de la Ficha Técnica (Tooltip)
+            const tooltipInfo = data 
+              ? `Letra: ${data.name} (${data.val})\n` +
+                `Tipo: ${data.type}\n` +
+                `Sefirá: ${data.sefira}\n` +
+                `Regente: ${data.planet}\n` +
+                `Elemento: ${data.element}\n\n` +
+                `>> ${data.energy}`
+              : 'Carácter desconocido';
+
             return (
-              <div key={index} className="char-card" style={{ borderColor: border }}>
+              <div 
+                key={index} 
+                className="char-card" 
+                title={tooltipInfo}
+              >
                 <div 
                   className="char-aura" 
                   style={{ backgroundColor: bgColor, opacity: 0.3 }}
@@ -34,8 +48,9 @@ const ZoharMonitor = ({ inputString }) => {
         )}
       </div>
 
+      {/* Buffer de Texto Crudo */}
       <div className="raw-text">
-        <strong>Buffer:</strong> {inputString}
+        {inputString || "..."}
       </div>
     </div>
   );

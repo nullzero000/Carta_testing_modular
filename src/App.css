@@ -1,225 +1,59 @@
-/* --- CONFIGURACIÓN DEL NÚCLEO (ROOT) --- */
-:root {
-  --bg-color: #f0f2f5;
-  --card-bg: #ffffff;
-  --primary: #1f2937;
-  --accent: #3b82f6;
-  --danger: #ef4444;
-  --touch-target: 44px; /* Mínimo estándar para dedos */
-}
+// src/components/ZoharMonitor.jsx
+import React from 'react';
+import { HEBREW_DATA } from '../data/constants';
 
-#root {
-  max-width: 100%;
-  min-height: 100vh;
-  margin: 0;
-  padding: 1rem;
-  box-sizing: border-box;
-  font-family: 'Courier New', monospace;
-  background-color: var(--bg-color);
-  color: var(--primary);
-  display: flex;
-  flex-direction: column;
-}
+const ZoharMonitor = ({ inputString }) => {
+  const characters = inputString.split('');
 
-/* --- ESTRUCTURA (SHELL) --- */
-.app-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+  return (
+    <div className="monitor-container">
+      <h2 className="monitor-header">MONITOR DE RESONANCIA (ZOHAR)</h2>
+      
+      {/* Visualización de Tarjetas (CSS maneja el RTL) */}
+      <div className="display-area">
+        {characters.length === 0 ? (
+          <span style={{ width: '100%', textAlign: 'center', opacity: 0.5, direction: 'ltr' }}>
+            Esperando pulsos...
+          </span>
+        ) : (
+          characters.map((char, index) => {
+            const data = HEBREW_DATA[char];
+            const bgColor = data ? data.color : 'transparent';
+            
+            // Construcción de la Ficha Técnica (Tooltip)
+            const tooltipInfo = data 
+              ? `Letra: ${data.name} (${data.val})\n` +
+                `Tipo: ${data.type}\n` +
+                `Sefirá: ${data.sefira}\n` +
+                `Regente: ${data.planet}\n` +
+                `Elemento: ${data.element}\n\n` +
+                `>> ${data.energy}`
+              : 'Carácter desconocido';
 
-header {
-  text-align: center;
-}
+            return (
+              <div 
+                key={index} 
+                className="char-card" 
+                title={tooltipInfo}
+              >
+                <div 
+                  className="char-aura" 
+                  style={{ backgroundColor: bgColor, opacity: 0.3 }}
+                ></div>
+                <span className="char-symbol">{char}</span>
+                {data && <span className="char-val">{data.val}</span>}
+              </div>
+            );
+          })
+        )}
+      </div>
 
-header h1 {
-  font-size: 1.5rem;
-  margin: 0;
-  letter-spacing: -1px;
-}
+      {/* Buffer de Texto Crudo */}
+      <div className="raw-text">
+        {inputString || "..."}
+      </div>
+    </div>
+  );
+};
 
-header p {
-  font-size: 0.8rem;
-  color: #666;
-  margin: 0.2rem 0 0 0;
-}
-
-/* --- LAYOUT PRINCIPAL (GRID REACTIVA) --- */
-.main-layout {
-  display: flex;
-  flex-direction: column; /* Por defecto: Columna (Móvil) */
-  gap: 1rem;
-}
-
-/* Solo en pantallas grandes (>768px) se divide en dos columnas */
-@media (min-width: 768px) {
-  .main-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-}
-
-.panel {
-  background: var(--card-bg);
-  padding: 1rem;
-  border-radius: 16px; /* Bordes más suaves */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* --- MÓDULO VISUAL (MONITOR ZOHAR) --- */
-.monitor-panel {
-  min-height: 150px;
-  display: flex;
-  flex-direction: column;
-}
-
-.display-area {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 10px;
-  background: #fafafa;
-  border: 2px dashed #e5e7eb;
-  border-radius: 12px;
-  justify-content: center; /* Centrado en móvil */
-  align-content: flex-start;
-  min-height: 120px;
-}
-
-.char-card {
-  position: relative;
-  width: 40px;  /* Ligeramente más pequeños para que quepan más */
-  height: 50px;
-  border: 2px solid;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: white;
-  transition: transform 0.1s;
-}
-
-.char-symbol {
-  font-size: 1.4rem;
-  font-weight: 700;
-  z-index: 2;
-  line-height: 1;
-}
-
-.char-val {
-  font-size: 0.6rem;
-  z-index: 2;
-  margin-top: 2px;
-  font-weight: bold;
-}
-
-.char-aura {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 1;
-}
-
-.raw-text {
-  margin-top: 0.8rem;
-  font-size: 0.8rem;
-  color: #888;
-  word-break: break-all;
-  text-align: center;
-}
-
-/* --- TECLADO ESTRUCTURAL (OPTIMIZADO TÁCTIL) --- */
-.keyboard-container h3 {
-  text-align: center;
-  margin-top: 0;
-  font-size: 1rem;
-  color: #444;
-}
-
-.keys-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 1rem;
-  touch-action: manipulation; /* Elimina delay de tap en móviles */
-}
-
-.key-row {
-  display: flex;
-  justify-content: space-between; /* Distribuye espacio */
-  gap: 4px;
-}
-
-.hebrew-btn {
-  flex: 1; /* El botón crece para llenar el hueco */
-  height: 48px; /* Altura táctil cómoda */
-  font-size: 1.3rem;
-  font-family: 'Times New Roman', serif; /* Mejor renderizado hebreo */
-  background: #f9fafb;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: background 0.1s, transform 0.05s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.hebrew-btn:active {
-  background: #e5e7eb;
-  transform: scale(0.95);
-}
-
-/* --- CONTROLES INFERIORES --- */
-.controls-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr; /* Espacio más grande (2fr) para el botón Espacio */
-  gap: 8px;
-}
-
-.control-btn {
-  height: 48px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 0.9rem;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.space-btn {
-  background: #d1d5db;
-  color: #374151;
-}
-
-.delete-btn {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-.clear-btn {
-  background: #ef4444;
-  color: white;
-}
-
-/* --- AJUSTES PARA PANTALLAS MUY PEQUEÑAS (iPhone SE, etc) --- */
-@media (max-width: 360px) {
-  .hebrew-btn {
-    height: 42px;
-    font-size: 1.1rem;
-  }
-  
-  #root {
-    padding: 0.5rem;
-  }
-}
+export default ZoharMonitor;
